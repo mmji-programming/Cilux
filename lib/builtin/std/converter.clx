@@ -1,0 +1,50 @@
+// std::converter — Binary Converters
+//
+// This module provides binary conversion circuits.
+//
+// Components:
+//   bin_to_gray_4bit — 4-bit Binary to Gray code converter
+//   gray_to_bin_4bit — 4-bit Gray to Binary code converter
+//
+// Truth Table (bin_to_gray_4bit):
+//   B3 B2 B1 B0 | G3 G2 G1 G0
+//   0  0  0  0  |  0  0  0  0
+//   0  0  0  1  |  0  0  0  1
+//   0  0  1  0  |  0  0  1  1
+//   0  0  1  1  |  0  0  1  0
+//   0  1  0  0  |  0  1  1  0
+//   0  1  0  1  |  0  1  1  1
+//   0  1  1  0  |  0  1  0  1
+//   0  1  1  1  |  0  1  0  0
+//   1  0  0  0  |  1  1  0  0
+//   ...
+//
+// Usage:
+//   import std::converter::bin_to_gray_4bit;
+//   import std::converter::*;
+//
+//   bin_to_gray_4bit c;
+//   r = c(b0=1, b1=0, b2=0, b3=0);
+//   r.g0 — 1, r.g1 — 1, r.g2 — 1, r.g3 — 1
+
+circuit bin_to_gray_4bit {
+
+    input b[3:0];
+    output g[3:0];
+    
+    b3 -> g3;
+    XOR(b2, b3) -> g2;
+    XOR(b1, b2) -> g1;
+    XOR(b0, b1) -> g0;
+}
+
+circuit gray_to_bin_4bit {
+    
+    input g[3:0];
+    output b[3:0];
+    
+    g3 -> b3;
+    XOR(b3, g2) -> b2;
+    XOR(b2, g1) -> b1;
+    XOR(b1, g0) -> b0;
+}

@@ -1,0 +1,55 @@
+// std::comparator — Binary Comparators
+//
+// This module provides binary comparator circuits.
+//
+// Components:
+//   comparator_1bit — 1-bit comparator (equal, greater)
+//   comparator_4bit — 4-bit magnitude comparator
+//
+// Truth Table (comparator_1bit):
+//   a b | eq gt
+//   0 0 |  1  0
+//   0 1 |  0  0
+//   1 0 |  0  1
+//   1 1 |  1  0
+//
+// Usage:
+//   import std::comparator::comparator_1bit;
+//   import std::comparator::*;
+//
+//   comparator_1bit c;
+//   r = c(a=1, b=0);
+//   r.eq — 0, r.gt — 1
+
+circuit comparator_1bit {
+
+    input a, b;
+    output eq, gt;
+    
+    XNOR(a, b) -> eq;
+    AND(a, NOT(b)) -> gt;
+}
+
+circuit comparator_4bit {
+    
+    input a[3:0], b[3:0];
+    output eq, gt, lt;
+    
+    comparator_1bit cmp[3:0];
+    
+    r0 = cmp0(a=a0, b=b0);
+    r1 = cmp1(a=a1, b=b1);
+    r2 = cmp2(a=a2, b=b2);
+    r3 = cmp3(a=a3, b=b3);
+    
+    AND(r0.eq, r1.eq, r2.eq, r3.eq) -> eq;
+    
+    OR(
+        r3.gt,
+        AND(r3.eq, r2.gt),
+        AND(r3.eq, r2.eq, r1.gt),
+        AND(r3.eq, r2.eq, r1.eq, r0.gt)
+    ) -> gt;
+    
+    NOR(eq, gt) -> lt;
+}

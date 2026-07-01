@@ -1,0 +1,161 @@
+clock CLK;
+circuit CPU_4BIT {
+
+    input RST, DIN0, DIN1, DIN2, DIN3;
+    input OP0, OP1, OP2;
+    output DOUT0, DOUT1, DOUT2, DOUT3;
+    output PC0, PC1, PC2, PC3;
+    output ZFLAG, CFLAG;
+
+    when CLK @posedge {
+        if (RST) {
+            S0 <= 0;
+            S1 <= 0;
+            S2 <= 0;
+
+            PC0 <= 0;
+            PC1 <= 0;
+            PC2 <= 0;
+            PC3 <= 0;
+
+            A0 <= 0;
+            A1 <= 0;
+            A2 <= 0;
+            A3 <= 0;
+
+            T0 <= 0;
+            T1 <= 0;
+            T2 <= 0;
+            T3 <= 0;
+
+            OPR0 <= 0;
+            OPR1 <= 0;
+            OPR2 <= 0;
+
+            CARRY <= 0;
+            ZFLAG <= 0;
+            CFLAG <= 0;
+        } else {
+            if (AND(NOT(S2), AND(NOT(S1), NOT(S0)))) {
+                // ---------------- FETCH (000) ----------------
+                S0 <= NOT(OP2);
+                S1 <= OP2;
+                S2 <= OP2;
+
+                T0 <= DIN0;
+                T1 <= DIN1;
+                T2 <= DIN2;
+                T3 <= DIN3;
+
+                OPR0 <= OP0;
+                OPR1 <= OP1;
+                OPR2 <= OP2;
+
+                CARRY <= 0;
+
+                // self-incrementing 4-bit program counter
+                PC0 <= XOR(PC0, AND(NOT(PC1), AND(NOT(PC2), NOT(PC3))));
+                PC1 <= XOR(PC1, AND(PC0, AND(NOT(PC2), NOT(PC3))));
+                PC2 <= XOR(PC2, AND(AND(PC0, PC1), NOT(PC3)));
+                PC3 <= XOR(PC3, AND(AND(PC0, PC1), PC2));
+            } elif (AND(NOT(S2), AND(NOT(S1), S0))) {
+                // ---------------- ADD_B0 (001) ----------------
+                // t0' = T0 XOR OPR1  (OPR1=1 gives one's-complement for
+                // subtraction; OPR1 also supplies the +1 carry-in for
+                // two's-complement subtract at this same bit).
+                S0 <= 0;
+                S1 <= 1;
+                S2 <= 0;
+                A0 <= XOR(A0, XOR(XOR(T0, OPR1), OPR1));
+                CARRY <= OR(
+                    AND(A0, XOR(T0, OPR1)),
+                    AND(OPR1, XOR(A0, XOR(T0, OPR1)))
+                );
+            } elif (AND(NOT(S2), AND(S1, NOT(S0)))) {
+                // ---------------- ADD_B1 (010) ----------------
+                S0 <= 0;
+                S1 <= 0;
+                S2 <= 1;
+                A1 <= XOR(A1, XOR(XOR(T1, OPR1), CARRY));
+                CARRY <= OR(
+                    AND(A1, XOR(T1, OPR1)),
+                    AND(CARRY, XOR(A1, XOR(T1, OPR1)))
+                );
+            } elif (AND(S2, AND(NOT(S1), NOT(S0)))) {
+                // ---------------- ADD_B2 (100) ----------------
+                S0 <= 1;
+                S1 <= 0;
+                S2 <= 1;
+                A2 <= XOR(A2, XOR(XOR(T2, OPR1), CARRY));
+                CARRY <= OR(
+                    AND(A2, XOR(T2, OPR1)),
+                    AND(CARRY, XOR(A2, XOR(T2, OPR1)))
+                );
+            } elif (AND(S2, AND(NOT(S1), S0))) {
+                // ---------------- ADD_B3 (101) ----------------
+                S0 <= 1;
+                S1 <= 1;
+                S2 <= 0;
+                A3 <= XOR(A3, XOR(XOR(T3, OPR1), CARRY));
+                CFLAG <= OR(
+                    AND(A3, XOR(T3, OPR1)),
+                    AND(CARRY, XOR(A3, XOR(T3, OPR1)))
+                );
+            } elif (AND(S2, AND(S1, NOT(S0)))) {
+                // ---------------- LOGIC (110) ----------------
+                S0 <= 1;
+                S1 <= 1;
+                S2 <= 0;
+
+                if (OPR0) {
+                    if (OPR1) {
+                        // passthrough: A <- T
+                        A0 <= T0;
+                        A1 <= T1;
+                        A2 <= T2;
+                        A3 <= T3;
+                    } else {
+                        // XOR
+                        A0 <= XOR(A0, T0);
+                        A1 <= XOR(A1, T1);
+                        A2 <= XOR(A2, T2);
+                        A3 <= XOR(A3, T3);
+                    }
+                } else {
+                    if (OPR1) {
+                        // OR
+                        A0 <= OR(A0, T0);
+                        A1 <= OR(A1, T1);
+                        A2 <= OR(A2, T2);
+                        A3 <= OR(A3, T3);
+                    } else {
+                        // AND
+                        A0 <= AND(A0, T0);
+                        A1 <= AND(A1, T1);
+                        A2 <= AND(A2, T2);
+                        A3 <= AND(A3, T3);
+                    }
+                }
+            } elif (AND(NOT(S2), AND(S1, S0))) {
+                // ---------------- DONE (011) ----------------
+                S0 <= 0;
+                S1 <= 0;
+                S2 <= 0;
+                ZFLAG <= AND(AND(NOT(A0), NOT(A1)), AND(NOT(A2), NOT(A3)));
+            } else {
+                // State 111 is never reached by any transition above;
+                // kept explicit (rather than omitted) so every code path
+                // assigns S0/S1/S2 and the compiler never has to invent a
+                // fallback for an unassigned register.
+                S0 <= 0;
+                S1 <= 0;
+                S2 <= 0;
+            }
+        }
+    }
+
+    A0 -> DOUT0;
+    A1 -> DOUT1;
+    A2 -> DOUT2;
+    A3 -> DOUT3;
+}

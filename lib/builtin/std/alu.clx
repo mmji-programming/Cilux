@@ -1,0 +1,62 @@
+// std::alu — Arithmetic Logic Unit
+//
+// This module provides ALU circuits.
+//
+// Components:
+//   alu_1bit — 1-bit ALU with 4 operations
+//   alu_4bit — 4-bit ALU with 4 operations
+//
+// Operations (op[1:0]):
+//   00 — ADD (sum)
+//   01 — AND
+//   10 — OR
+//   11 — XOR
+//
+// Usage:
+//   import std::alu::alu_1bit;
+//   import std::alu::*;
+//
+//   alu_1bit a;
+//   r = a(a=1, b=1, op0=0, op1=0);
+//   r.result — 0 (sum), r.cout — 1
+
+import mux::{
+    mux_2
+};
+
+circuit alu_1bit {
+    input a, b, op[1:0];
+    output result, cout;
+    
+    t_sum = XOR(a, b);
+    t_and = AND(a, b);
+    t_or = OR(a, b);
+    t_xor = XOR(a, b);
+    
+    mux_2 m[1:0];
+    
+    s0 = m0(d0=t_sum, d1=t_and, sel=op0);
+    s1 = m1(d0=t_or, d1=t_xor, sel=op0);
+    s2 = m0(d0=s0.out, d1=s1.out, sel=op1);
+    
+    s2.out -> result;
+    t_and -> cout;
+}
+
+circuit alu_4bit {
+    input a[3:0], b[3:0], op[1:0];
+    output result[3:0], cout;
+    
+    alu_1bit alu[3:0];
+    
+    r0 = alu0(a=a0, b=b0, op0=op0, op1=op1);
+    r1 = alu1(a=a1, b=b1, op0=op0, op1=op1);
+    r2 = alu2(a=a2, b=b2, op0=op0, op1=op1);
+    r3 = alu3(a=a3, b=b3, op0=op0, op1=op1);
+    
+    r0.result -> result0;
+    r1.result -> result1;
+    r2.result -> result2;
+    r3.result -> result3;
+    r3.cout -> cout;
+}

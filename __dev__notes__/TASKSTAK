@@ -1,0 +1,4 @@
+// Guid:
+//     #[<priority_number>?.<issue>] <description>
+
+#[1.warning] Fix a minor schemdraw rendering issue discovered in full_adder that may affect similar circuits /lang/engines/render_schemdraw_engine.py

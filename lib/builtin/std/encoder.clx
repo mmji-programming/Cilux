@@ -1,0 +1,57 @@
+// std::encoder — Binary Encoders
+//
+// This module provides binary encoder circuits.
+//
+// Components:
+//   encoder_4to2        — 4-to-2 encoder
+//   encoder_8to3        — 8-to-3 encoder
+//   priority_encoder_4to2 — 4-to-2 priority encoder
+//
+// Truth Table (encoder_4to2):
+//   d3 d2 d1 d0 | y1 y0
+//   0  0  0  1  |  0  0
+//   0  0  1  0  |  0  1
+//   0  1  0  0  |  1  0
+//   1  0  0  0  |  1  1
+//
+// Priority Encoder (priority_encoder_4to2):
+//   d3 d2 d1 d0 | y1 y0
+//   0  0  0  0  |  0  0
+//   0  0  0  1  |  0  0
+//   0  0  1  x  |  0  1
+//   0  1  x  x  |  1  0
+//   1  x  x  x  |  1  1
+//
+// Usage:
+//   import std::encoder::encoder_4to2;
+//   import std::encoder::*;
+//
+//   encoder_4to2 e;
+//   r = e(d0=1, d1=0, d2=0, d3=0);
+//   r.y0 — 0, r.y1 — 0
+
+circuit encoder_4to2 {
+    input d[3:0];
+    output y[1:0];
+    
+    OR(d1, d3) -> y0;
+    OR(d2, d3) -> y1;
+}
+
+circuit encoder_8to3 {
+    input d[7:0];
+    output y[2:0];
+    
+    OR(d1, d3, d5, d7) -> y0;
+    OR(d2, d3, d6, d7) -> y1;
+    OR(d4, d5, d6, d7) -> y2;
+}
+
+circuit priority_encoder_4to2 {
+    input d[3:0];
+    output y[1:0], valid;
+    
+    OR(d0, d1, d2, d3) -> valid;
+    OR(d2, d3) -> y1;
+    OR(d1, d3) -> y0;
+}

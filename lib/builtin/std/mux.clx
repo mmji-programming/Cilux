@@ -1,0 +1,57 @@
+// std::mux — Multiplexers
+// 
+// This module provides multiplexer circuits.
+//
+// Components:
+//   mux_2   — 2-to-1 multiplexer
+//   mux_4   — 4-to-1 multiplexer
+//   mux_8   — 8-to-1 multiplexer
+//
+// Truth Table (mux_2):
+//   sel | out
+//    0  | d0
+//    1  | d1
+//
+// Usage:
+//   import std::mux::mux_2;
+//   import std::mux::*;
+//
+//   mux_2 m;
+//   r = m(d0=1, d1=0, sel=1);
+//   r.out — 0
+
+circuit mux_2 {
+    input d0, d1, sel;
+    output out;
+    
+    t0 = AND(NOT(sel), d0);
+    t1 = AND(sel, d1);
+    OR(t0, t1) -> out;
+}
+
+circuit mux_4 {
+    input d0, d1, d2, d3, s0, s1;
+    output out;
+    
+    mux_2 m_low, m_high, m_final;
+    
+    r_low = m_low(d0=d0, d1=d1, sel=s0);
+    r_high = m_high(d0=d2, d1=d3, sel=s0);
+    r = m_final(d0=r_low.out, d1=r_high.out, sel=s1);
+    
+    r.out -> out;
+}
+
+circuit mux_8 {
+    input d0, d1, d2, d3, d4, d5, d6, d7, s0, s1, s2;
+    output out;
+    
+    mux_4 m_low, m_high;
+    mux_2 m_final;
+    
+    r_low = m_low(d0=d0, d1=d1, d2=d2, d3=d3, s0=s0, s1=s1);
+    r_high = m_high(d0=d4, d1=d5, d2=d6, d3=d7, s0=s0, s1=s1);
+    r = m_final(d0=r_low.out, d1=r_high.out, sel=s2);
+    
+    r.out -> out;
+}

@@ -1,0 +1,70 @@
+// std::adder — Binary Adders
+//
+// This module provides fundamental binary addition circuits.
+//
+// Components:
+//   half_adder          — 2-bit addition without carry input
+//   full_adder          — 2-bit addition with carry input
+//   ripple_carry_adder_4bit — 4-bit adder using cascaded full adders
+//
+// Truth Tables:
+//
+//   half_adder:           full_adder:
+//   a b | sum carry       a b cin | sum cout
+//   0 0 |  0   0          0 0  0  |  0   0
+//   0 1 |  1   0          0 0  1  |  1   0
+//   1 0 |  1   0          0 1  0  |  1   0
+//   1 1 |  0   1          0 1  1  |  0   1
+//                          1 0  0  |  1   0
+//                          1 0  1  |  0   1
+//                          1 1  0  |  0   1
+//                          1 1  1  |  1   1
+//
+// Usage:
+//   import std::adder::half_adder;
+//   import std::adder::*;
+//
+//   half_adder ha;
+//   result = ha(1, 0);
+//   result.sum       — 1
+//   result.carry_out — 0
+
+circuit half_adder {
+    input a, b;
+    output sum, cout;
+    
+    XOR(a, b) -> sum;
+    AND(a, b) -> cout;
+}
+
+circuit full_adder {
+    input a, b, cin;
+    output sum, cout;
+    
+    half_adder ha1, ha2;
+    
+    s1 = ha1(a, b);
+    s2 = ha2(s1.sum, cin);
+    
+    s2.sum -> sum;
+    OR(s1.cout, s2.cout) -> cout;
+}
+
+circuit ripple_carry_adder_4bit {
+    
+    input a[3:0], b[3:0], cin;
+    output sum[3:0], cout;
+    
+    full_adder fa[3:0];
+    
+    r0 = fa0(a=a0, b=b0, cin=cin);
+    r1 = fa1(a=a1, b=b1, cin=r0.cout);
+    r2 = fa2(a=a2, b=b2, cin=r1.cout);
+    r3 = fa3(a=a3, b=b3, cin=r2.cout);
+    
+    r0.sum -> sum0;
+    r1.sum -> sum1;
+    r2.sum -> sum2;
+    r3.sum -> sum3;
+    r3.cout -> cout;
+}

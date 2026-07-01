@@ -1,0 +1,64 @@
+// Guide:
+//  '[%]'  : Almost done or being done.
+//  '[x]'  : It was a bad idea, but it might come in handy one day.
+//  '[*]'  : Completely done.
+//  '[oo]' : It never ends :)
+//  '<...>': Explanations are placed between these.
+//  '1'    : High priority
+//  '<=1' : Less or equal priority
+
+
+[oo] Language architecture and implementation optimization
+[oo] Add more digital design concepts
+
+// 1
+[] Improve code modularity by decomposing large modules into focused, single-responsibility components
+[] Compile for Linux/MacOSX
+[] Update grammar of when_stmt for support multi clock like "when (clk or rst or set) @posedge { ... }
+[] Support default argument
+[] Support dot_access assign
+[] Add tests
+[] Handle exec_... handlres for right structure
+[] Add builtin errors
+[] Support "assert" keyword
+[] Handle true type object in context
+[] Support batch input/output
+[] Optimize speed and draw logic of /lang/engines/ascii_draw_engine.py
+[] Expanding the use of bridge functions in /lang/bridges/*, for example, take the path of a file and interact with it fully.
+[%] access to method/attributes of a component [OOP like]
+[%] Use cache for parser (using a cached parser instead of generating it on each run)
+[%] Update /lang/funcs/wave.py, /lang/funcs/table.py for support from sequential circuit
+[%] Write document <very bad document, rewrite>
+[%] Desing a icon
+
+
+// <=1
+[] Improve __export__ 
+[] Improve collect arguments
+[] Karnaugh map
+[] Package manager
+[] Adding nonlocal, global keywords to access non-local variables
+[] Implement access levels
+[] Add tracebak errors
+[] Optimize context structure
+[] Add param_type(s) to 'Plugin'
+[] Add return_type(s) to 'Plugin'
+[] Validate args(param_type(s), return_type(s)) (function)
+[] Add getter for 'List', 'Dict' (full development of all possible features)
+[] Refactor type managing
+[] Add more type <string, number(s), tuple, ...> <fix bug in lang/funcs/wave.py/_exec_wave for handle tuple argument | add tuple for arg, named_arg>
+[] Exception handling
+[] Add 'for' component 
+[] Add 'len' function
+[] MagicMethod base development
+[] Support file handling
+[] Adding more features to REPL
+[*] Transitive dependency resolution for imports <TPR: TransitiveDependencyResolution, fix TPR in /lang/funcs/synth/*>
+[%] Export EDIF, BLIF <Support for the 'BLIF' format is almost complete but needs revision.>
+[%] Add GUI for export <optimized the wiring algorithm, solved the problem of overlapping wires and not drawing dots on ports in the full_adder circuit, increased speed>
+[%] Sequential Logic
+[%] Add inline grammar (inline call, ....) (use in: /lang/funcs/synth/*)
+[%] Support nested define in /lang/funcs/synth/*
+[%] Support deep var define in /lang/funcs/synth/*
+[x] Add netlist as internal map in /lang/structs/gate.py/Gate.__init__
+[x] Add basic math operator
