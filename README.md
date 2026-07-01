@@ -156,6 +156,13 @@ Cilux targets Python 3.12+ and depends on:
 lark, matplotlib, networkx, pillow, platformdirs, schemdraw, yowasp-yosys, zstandard
 ```
 
+### Platform Support
+
+Prebuilt binaries and installer packages are currently available for **Windows** only and can be downloaded from the [Releases](../../releases) page.
+Support for **Linux** and **macOS** is planned for future releases. Until then, Cilux can still be built and run from source on these platforms.
+
+
+
 Install dependencies and run from source:
 
 ```bash
