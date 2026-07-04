@@ -169,7 +169,7 @@ Install dependencies and run from source:
 pip install -r requirements.txt
 python main.py                       # REPL
 python main.py my_design.clx         # run a file
-python main.py --code "print(1)"         # run inline code
+python main.py --code "print(1)"     # run inline code
 python main.py -v                    # print version
 python main.py -g grammar.lark       # dump the fully composed Lark grammar to a file
 ```
