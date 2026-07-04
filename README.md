@@ -71,7 +71,7 @@ print(result.sum, result.cout);   // 1 0
 Running it:
 
 ```bash
-cilux -c "circuit half_adder { input a, b; output sum, cout; XOR(a, b) -> sum; AND(a, b) -> cout; } print(half_adder(1,0));"
+cilux --code "circuit half_adder { input a, b; output sum, cout; XOR(a, b) -> sum; AND(a, b) -> cout; } print(half_adder(1,0));"
 ```
 
 or, saved as a file:
@@ -169,7 +169,7 @@ Install dependencies and run from source:
 pip install -r requirements.txt
 python main.py                       # REPL
 python main.py my_design.clx         # run a file
-python main.py -c "print(1)"         # run inline code
+python main.py --code "print(1)"         # run inline code
 python main.py -v                    # print version
 python main.py -g grammar.lark       # dump the fully composed Lark grammar to a file
 ```
